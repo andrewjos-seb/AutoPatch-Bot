@@ -1,2 +1,5 @@
-vgysduhbverufvuyerbuerfdhbufhdbiejr
-sdefvwer
+def get_user(username, password):
+    # VULNERABLE: Direct string interpolation into SQL
+    query = f"SELECT * FROM users WHERE user='{username}' AND pw='{password}'"
+    cursor.execute(query)
+    return cursor.fetchone()
