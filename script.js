@@ -8,11 +8,10 @@ async function scan() {
     const repoOwner = document.getElementById('repoOwner').value;
     const repoName = document.getElementById('repoName').value;
     const branchName = document.getElementById('branchName').value;
-    const geminiApiKey = document.getElementById('geminiApiKey').value;
     const resultsContainer = document.getElementById('results');
 
-    if (!githubToken || !repoOwner || !repoName || !branchName || !geminiApiKey) {
-        alert('Please fill in all fields.');
+    if (!githubToken || !repoOwner || !repoName || !branchName) {
+        alert('Please fill in GitHub Token, Repo Owner, Repo Name, and Branch Name.');
         return;
     }
 
@@ -39,27 +38,12 @@ async function scan() {
                     <h4>${file.filename}</h4>
                 `;
 
-                if (file.status === 'removed') {
-                    resultsHtml += '<p>File removed.</p></div>';
-                    continue;
-                }
-                
-                const content = await getFileContent(githubToken, repoOwner, repoName, file.sha);
-                const decodedContent = atob(content); // content is base64 encoded
-                const analysisResults = await analyzeContent(geminiApiKey, decodedContent);
-
-                if (analysisResults && analysisResults.length > 0) {
-                    for (const result of analysisResults) {
-                        resultsHtml += `<div class="vulnerability">
-                            <p><strong>Vulnerability:</strong> ${result.vulnerability_found}</p>
-                            <p><strong>Explanation:</strong> ${result.explanation}</p>
-                            <p><strong>Suggested Fix:</strong> <pre><code>${result.suggested_fix}</code></pre></p>
-                            <p><strong>Confidence:</strong> ${result.confidence_score}</p>
-                        </div>`;
-                    }
+                if (file.patch) {
+                    resultsHtml += `<pre><code>${file.patch}</code></pre>`;
                 } else {
-                    resultsHtml += '<p>No vulnerabilities found.</p>';
+                    resultsHtml += '<p>No patch data available.</p>';
                 }
+
                 resultsHtml += '</div>';
             }
             resultsHtml += '</div>';
@@ -106,71 +90,71 @@ async function getCommitFiles(token, owner, repo, commitSha) {
     return commitData.files;
 }
 
-async function getFileContent(token, owner, repo, fileSha) {
-    const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/git/blobs/${fileSha}`;
-    const headers = { 'Authorization': `token ${token}` };
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-    }
-    const blobData = await response.json();
-    return blobData.content;
-}
+// async function getFileContent(token, owner, repo, fileSha) {
+//     const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/git/blobs/${fileSha}`;
+//     const headers = { 'Authorization': `token ${token}` };
+//     const response = await fetch(url, { headers });
+//     if (!response.ok) {
+//         throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+//     }
+//     const blobData = await response.json();
+//     return blobData.content;
+// }
 
-async function analyzeContent(apiKey, fileContent) {
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+// async function analyzeContent(apiKey, fileContent) {
+//     const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
-    const prompt = `
-    You are an expert AI security agent. Perform a security scan on the following source code.
-    GOAL: Detect potential instances of vulnerabilities like SQL Injection, XSS, Hardcoded Secrets, etc.
-    For EACH vulnerability found, output a separate, complete JSON object.
-    If no vulnerabilities are found, return an empty list [].
-    Analyze this code:
-    ${fileContent}
-    Respond ONLY with a list of JSON objects in this format:
-    [
-        {
-            "vulnerability_found": "Name of vulnerability or 'None'",
-            "explanation": "Why this is a risk.",
-            "suggested_fix": "Code block to fix the issue.",
-            "confidence_score": "1-10"
-        }
-    ]
-    `;
+//     const prompt = `
+//     You are an expert AI security agent. Perform a security scan on the following source code.
+//     GOAL: Detect potential instances of vulnerabilities like SQL Injection, XSS, Hardcoded Secrets, etc.
+//     For EACH vulnerability found, output a separate, complete JSON object.
+//     If no vulnerabilities are found, return an empty list [].
+//     Analyze this code:
+//     ${fileContent}
+//     Respond ONLY with a list of JSON objects in this format:
+//     [
+//         {
+//             "vulnerability_found": "Name of vulnerability or 'None'",
+//             "explanation": "Why this is a risk.",
+//             "suggested_fix": "Code block to fix the issue.",
+//             "confidence_score": "1-10"
+//         }
+//     ]
+//     `;
 
-    const payload = {
-        "contents": [{
-            "parts": [{
-                "text": prompt
-            }]
-        }]
-    };
+//     const payload = {
+//         "contents": [{
+//             "parts": [{
+//                 "text": prompt
+//             }]
+//         }]
+//     };
 
-    const response = await fetch(GEMINI_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
+//     const response = await fetch(GEMINI_API_URL, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(payload)
+//     });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorText}`);
-    }
+//     if (!response.ok) {
+//         const errorText = await response.text();
+//         throw new Error(`Gemini API error: ${response.status} ${response.statusText} - ${errorText}`);
+//     }
 
-    const data = await response.json();
-    const responseText = data.candidates[0].content.parts[0].text;
+//     const data = await response.json();
+//     const responseText = data.candidates[0].content.parts[0].text;
     
-    try {
-        // The response might be wrapped in markdown
-        const jsonMatch = responseText.match(/```(?:json)?\s*(\[.*\])\s*```/s);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[1]);
-        } else {
-            return JSON.parse(responseText);
-        }
-    } catch (e) {
-        console.error("Failed to parse JSON from Gemini response:", responseText);
-        return null;
-    }
-}
+//     try {
+//         // The response might be wrapped in markdown
+//         const jsonMatch = responseText.match(/```(?:json)?\s*(\[.*\])\s*```/s);
+//         if (jsonMatch) {
+//             return JSON.parse(jsonMatch[1]);
+//         } else {
+//             return JSON.parse(responseText);
+//         }
+//     } catch (e) {
+//         console.error("Failed to parse JSON from Gemini response:", responseText);
+//         return null;
+//     }
+// }
 
