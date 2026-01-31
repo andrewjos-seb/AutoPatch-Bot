@@ -1,0 +1,3 @@
+flask
+PyGithub
+google-generativeai
