@@ -74,8 +74,7 @@ def main():
             if new_commits and new_commits.strip():
                 print("\n\n>>> New Commits Found <<<")
                 print(new_commits)
-                print(">>> End of New Commits <<<
-")
+                print(">>> End of New Commits <<<\n")
             else:
                 print("No new commits found.")
             
