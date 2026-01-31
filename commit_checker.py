@@ -13,7 +13,7 @@ def check_for_new_commits(repo_path, branch):
     """
     try:
         # Store original working directory
-        original_cwd = os.getcwd()
+       
         
         # Change to the repository directory
         # Ensure repo_path is absolute or relative to the script's execution directory
