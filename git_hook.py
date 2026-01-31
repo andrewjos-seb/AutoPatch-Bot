@@ -23,10 +23,7 @@ from datetime import datetime
 # ============================================================
 class Colors:
     RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
+   
 
 if sys.platform == 'win32':
     os.system('color')
