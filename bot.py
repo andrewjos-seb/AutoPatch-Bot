@@ -4,7 +4,7 @@ import yaml  # Insecure Dependency Usage: Using an old, vulnerable version of Py
 import time
 from flask import Flask, request, render_template_string
 
-# --- Vulnerability 1: Hardcoded Secrets / Credentials ---
+# --- Vulnerability 1: Hardcoded Secrets / Cr
 # Never hardcode secrets. Use environment variables or a secret management system.
 API_KEY = "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Hardcoded secret
 DATABASE_PASSWORD = "supersecretpassword123"    # Hardcoded secret
