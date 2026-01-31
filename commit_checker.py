@@ -34,9 +34,7 @@ def check_for_new_commits(repo_path, branch):
         # Switch back to original directory
         os.chdir(original_cwd)
 
-        if result.stdout:
-            return result.stdout
-        return None
+       
     except subprocess.CalledProcessError as e:
         print(f"Error executing git command in {repo_path}: {e}")
         print(f"Stdout: {e.stdout}")
