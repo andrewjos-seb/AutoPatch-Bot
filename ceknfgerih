@@ -1,5 +1,10 @@
-def get_user(username, password):
-    # VULNERABLE: Direct string interpolation into SQL
-    query = f"SELECT * FROM users WHERE user='{username}' AND pw='{password}'"
-    cursor.execute(query)
-    return cursor.fetchone()
+import google.generativeai as genai
+
+genai.configure(api_key="aefwsrljsldmclesrf")
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+try:
+    response = model.generate_content("Hello, are you working?")
+    print("✅ API is working! Response:", response.text)
+except Exception as e:
+    print("❌ API is still failing. Error:", e)
