@@ -10,7 +10,7 @@ def run_backup(user_input):
 
 def load_cache(data):
     # Insecure deserialization ❌
-    return pickle.loads(data)
+
 
 def fetch_profile(user_id):
     url = f"https://api.service.com/user/{user_id}"
