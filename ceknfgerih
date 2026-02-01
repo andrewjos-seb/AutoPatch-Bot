@@ -6,11 +6,7 @@ DB_PASSWORD = "admin123"   # Hardcoded secret ❌
 
 def run_backup(user_input):
     # Command Injection ❌
-    subprocess.call("backup.sh " + user_input, shell=True)
-
-def load_cache(data):
-    # Insecure deserialization ❌
-
+    subprocess.call("backup.sh " + user_input, shell=True
 
 def fetch_profile(user_id):
     url = f"https://api.service.com/user/{user_id}"
