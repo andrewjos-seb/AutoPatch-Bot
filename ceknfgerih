@@ -6,7 +6,6 @@ import threading
     query = "SELECT * FROM users WHERE name = '" + username + "'"
     cursor.execute(query)
 
-    print("Fetching data for:", username)  # Sensitive data exposure ❌
 
 def write_file(data):
     file = open("/tmp/data.txt", "w")
