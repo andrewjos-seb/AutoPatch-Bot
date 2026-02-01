@@ -8,7 +8,7 @@ from flask import Flask, request, render_template_string
 # --- Vulnerability 1: Hardcoded Secrets / Credentials ---
 # Never hardcode secrets. Use environment variables or a secret management system.
 API_KEY = "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Hardcoded secret
-DATABASE_PASSWORD = "supersecretpassword123"    # Hardcoded secret
+DATABASE_PASSWORD = "supersecretpassword123"   
 
 app = Flask(__name__)
 
