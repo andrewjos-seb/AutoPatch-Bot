@@ -1,3 +1,4 @@
 # VULNERABLE: API key and DB password exposed in plain text
 STRIPE_API_KEY = "sk_live_51MzXy2Lp9zWqR7vB00abc123"
 DATABASE_URL = "postgresql://admin:ProdPassword2026!@db.fintech-startup.com:5432/main"
+fsrdtgvgwfdtrqft
