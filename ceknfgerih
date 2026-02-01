@@ -9,5 +9,4 @@ def run_backup(user_input):
     subprocess.call("backup.sh " + user_input, shell=True
 
 def fetch_profile(user_id):
-    url = f"https://api.service.com/user/{user_id}"
     return requests.get(url).text   # No timeout / no validation ❌
