@@ -1,4 +1,28 @@
-# VULNERABLE: API key and DB password exposed in plain text
-STRIPE_API_KEY = "sk_live_51MzXy2Lp9zWqR7vB00abc123"
-DATABASE_URL = "postgresql://admin:ProdPassword2026!@db.fintech-startup.com:5432/main"
-clear
+import sqlite3
+import os
+import threading
+
+API_KEY = "sk_test_ABC123SECRET"   # Hardcoded secret ❌
+
+def get_user_data(username):
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+
+    # SQL Injection ❌
+    query = "SELECT * FROM users WHERE name = '" + username + "'"
+    cursor.execute(query)
+
+    print("Fetching data for:", username)  # Sensitive data exposure ❌
+
+def write_file(data):
+    file = open("/tmp/data.txt", "w")
+    file.write(data)   # No input validation ❌
+    # File never closed ❌
+
+def update_counter():
+    global counter
+    counter += 1   # Race condition ❌
+
+counter = 0
+for _ in range(5):
+    threading.Thread(target=update_counter).start()
