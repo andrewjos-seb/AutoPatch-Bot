@@ -1,2 +1,17 @@
-sDefesdvsadrfaervgysduhbverufvuyerbuerfdhbufhdbiejr
-sdefvwer
+import sqlite3
+
+def get_user_data(user_id):
+    db = sqlite3.connect("bank_users.db")
+    cursor = db.cursor()
+    
+    # ❌ VULNERABLE: Using an f-string to build the query
+    query = f"SELECT * FROM users WHERE id = '{user_id}'"
+    
+    # Alternatively, using string formatting:
+    # query = "SELECT * FROM users WHERE id = '%s'" % user_id
+    
+    cursor.execute(query)
+    return cursor.fetchone()
+
+# Example of a malicious test input:
+# get_user_data("' OR '1'='1")
